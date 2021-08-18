@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+<style type="text/css">
+	body {
+		font-size: 12px;
+	}
+	
+	ul li {
+		list-style: none;
+	}
+	.track-rcol {
+		width: 100%;
+		border: 1px solid #eee;
+	}
+	
+	.track-list {
+		margin: 20px;
+		padding-left: 5px;
+		position: relative;
+	}
+	
+	.track-list li {
+		position: relative;
+		padding: 9px 0 0 25px;
+		line-height: 18px;
+		border-left: 1px solid #d9d9d9;
+		color: #999;
+	}
+	
+	.track-list li.first {
+		color: red;
+		padding-top: 0;
+		border-left-color: #fff;
+	}
+	
+	.track-list li .node-icon {
+		position: absolute;
+		left: -6px;
+		top: 50%;
+		width: 11px;
+		height: 11px;
+		background: url(img/trank.png) -21px -72px no-repeat;
+	}
+	
+	.track-list li.first .node-icon {
+		background-position: 0 -72px;
+	}
+	
+	.track-list li .time {
+		margin-right: 20px;
+		position: relative;
+		top: 4px;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	
+	.track-list li .txt {
+		position: relative;
+		top: 4px;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	
+	.track-list li.first .time {
+		margin-right: 20px;
+	}
+	
+	.track-list li.first .txt {
+		max-width: 600px;
+	}
+</style>
+<div class="track-rcol">
+	<div class="track-list">
+		入口点
+		<ul>
+			{start_chain_html}
+		</ul>
+		出口点
+		<ul>
+			{end_chain_html}
+		</ul>
+	</div>
+</div>
+</body>
+</html>
+
+

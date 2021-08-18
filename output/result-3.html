@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>反序列化调用链3</title>
+    <style>
+        .biaoti{
+            font-family: "Microsoft Himalaya";
+            font-size: 26px;
+            border-bottom:1px dashed #CCCCCC;
+            color: #255e95;
+
+        }
+
+        .btgn{
+            font-family: "Microsoft YaHei UI";
+            font-size: 16px;
+            color: #255e95;
+            background-color: #e9faff;
+            text-align: center;
+        }
+
+        .start{
+            background-color: #01DFD7;
+        }
+        .end{
+            background-color: #ECF6CE;
+        }
+    </style>
+</head>
+<body>
+    <table width="60%" border="0">
+        <tr>
+            <td align="center" class="biaoti" height="60">系统调用过程</td>
+        </tr>
+        <tr>
+            <td align="right" height="25">2021-08-18 17:21:25</td>
+        </tr>
+    </table>
+
+    <table width="60%" border="1" cellspacing="1" cellpadding="4">
+        <tr>
+            <td class="btgn">出入口</td>
+            <td class="btgn">函数</td>
+            <td class="btgn">函数路径</td>
+            <td class="btgn">来源</td>
+            <td class="btgn">深度</td>
+        </tr>
+
+
+        
+                <tr>
+                    <td class=start>入口</td>
+                    <td class=start>query</td>
+                    <td class=start>D:/phpstudy_pro/WWW/CodeIgniter4/system/Session/Handlers/DatabaseHandler.php<br>D:/phpstudy_pro/WWW/CodeIgniter4/system/Session/Handlers/RedisHandler.php</td>
+                    <td class=start>close</td>
+                    <td class=start>2</td>
+                </tr>
+            
+                <tr>
+                    <td class=start>入口</td>
+                    <td class=start>close</td>
+                    <td class=start>D:/phpstudy_pro/WWW/CodeIgniter4/system/Cache/Handlers/RedisHandler.php<br>D:/phpstudy_pro/WWW/CodeIgniter4/system/Cache/Handlers/MemcachedHandler.php</td>
+                    <td class=start>__destruct</td>
+                    <td class=start>1</td>
+                </tr>
+            
+                <tr>
+                    <td class=start>入口</td>
+                    <td class=start>__destruct</td>
+                    <td class=start>D:/phpstudy_pro/WWW/CodeIgniter4/system/Cache/Handlers/RedisHandler.php<br>D:/phpstudy_pro/WWW/CodeIgniter4/system/Email/Email.php<br>D:/phpstudy_pro/WWW/CodeIgniter4/system/Cache/Handlers/MemcachedHandler.php</td>
+                    <td class=start>__destruct(</td>
+                    <td class=start>0</td>
+                </tr>
+            
+
+        
+                <tr>
+                    <td class=end>出口</td>
+                    <td class=end>query</td>
+                    <td class=end>D:/phpstudy_pro/WWW/CodeIgniter4/system/Test/Mock/MockConnection.php<br>D:/phpstudy_pro/WWW/CodeIgniter4/system/Database/BaseConnection.php</td>
+                    <td class=end>	$query->swapPrefix($this-></td>
+                    <td class=end>0</td>
+                </tr>
+            
+
+
+    </table>
+</body>
+</html>

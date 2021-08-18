@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>反序列化调用链{sequence}</title>
+    <style>
+        .biaoti{
+            font-family: "Microsoft Himalaya";
+            font-size: 26px;
+            border-bottom:1px dashed #CCCCCC;
+            color: #255e95;
+
+        }
+
+        .btgn{
+            font-family: "Microsoft YaHei UI";
+            font-size: 16px;
+            color: #255e95;
+            background-color: #e9faff;
+            text-align: center;
+        }
+
+        .start{
+            background-color: #01DFD7;
+        }
+        .end{
+            background-color: #ECF6CE;
+        }
+    </style>
+</head>
+<body>
+    <table width="60%" border="0">
+        <tr>
+            <td align="center" class="biaoti" height="60">系统调用过程</td>
+        </tr>
+        <tr>
+            <td align="right" height="25">{now_time}</td>
+        </tr>
+    </table>
+
+    <table width="60%" border="1" cellspacing="1" cellpadding="4">
+        <tr>
+            <td class="btgn">出入口</td>
+            <td class="btgn">函数</td>
+            <td class="btgn">函数路径</td>
+            <td class="btgn">来源</td>
+            <td class="btgn">深度</td>
+        </tr>
+
+
+        {start_chain_html}
+
+        {end_chain_html}
+
+
+    </table>
+</body>
+</html>
