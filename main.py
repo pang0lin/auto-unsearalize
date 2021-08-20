@@ -73,6 +73,8 @@ if __name__ == '__main__':
     for i  in range(depth):
         print("  [*] search chain depth {},started ".format(i))
         start_chain_funs = extendChainNext(files, start_chain_funs, i)
+
+        # printChain(start_chain_funs)
         end_chain_funs = extendChainPrev(files, end_chain_funs, i)
 
         for new_chain in compareChain(start_chain_funs, end_chain_funs):

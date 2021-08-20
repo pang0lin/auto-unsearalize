@@ -42,6 +42,7 @@ def extendChainPrev(files, chain_functions, depth):
                         addChainPrev(chain_functions, {"func_name":func_name, "filepath":filepath, "depth": depth+1, "from":chain_function_name})
     return chain_functions
 
+
 def getChainList(chain_functions):
     rnt = []
     for chain_function in chain_functions:
